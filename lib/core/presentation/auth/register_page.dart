@@ -78,6 +78,10 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
+        if (state.status == AuthStatus.needsGenderSelection) {
+          context.go('/gender-selection');
+        }
+
         if (state.status == AuthStatus.authenticated) {
           context.go('/home');
         }
@@ -94,6 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
         }
       },
       builder: (context, state) {
+        final isLoading = state.status == AuthStatus.loading;
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: GestureDetector(
@@ -206,9 +211,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
                           AuthButton(
                             title: 'CREATE ACCOUNT',
-                            onPressed: state.status == AuthStatus.loading
-                                ? () {}
-                                : _register,
+                            isLoading: isLoading,
+                            onPressed: _register,
                           ),
 
                           const SizedBox(height: 24),
@@ -226,7 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                               TextButton(
-                                onPressed: () => context.go('/login'),
+                                onPressed: isLoading ? null : () => context.go('/login'),
                                 child: const Text(
                                   'Sign In',
                                   style: TextStyle(

@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import '../../auth/widgets/fashion_background.dart';
 import '../models/outfit_item.dart';
 import '../widgets/category_styles_page.dart';
+import '../widgets/outfit_detail_page.dart';
 import '../widgets/outfit_grid_card.dart';
 
 class StyledForYouPage extends StatefulWidget {
   final String? initialCategory;
+  final String gender;
 
   const StyledForYouPage({
     super.key,
     this.initialCategory,
+    required this.gender,
   });
 
   @override
@@ -146,14 +149,13 @@ class _StyledForYouPageState extends State<StyledForYouPage> {
     ],
   };
 
-  // Open selected category page
-  void _openCategory(String category) {
+  void _openOutfitDetail(OutfitItem outfit) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CategoryStylesPage(
-          categoryName: category,
-          outfits: outfitsByCategory[category] ?? [],
+        builder: (_) => OutfitDetailPage(
+          outfit: outfit,
+          categoryName: selectedCategory,
         ),
       ),
     );
@@ -330,11 +332,9 @@ class _StyledForYouPageState extends State<StyledForYouPage> {
 
                     return GestureDetector(
                       onTap: () {
-                        _openCategory(selectedCategory);
+                        _openOutfitDetail(outfit);
                       },
-                      child: OutfitGridCard(
-                        item: outfit,
-                      ),
+                      child: OutfitGridCard(item: outfit),
                     );
                   },
                 ),

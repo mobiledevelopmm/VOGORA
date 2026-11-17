@@ -30,17 +30,16 @@ class AuthService {
       throw Exception('User account could not be created.');
     }
 
-    // Save display name in Firebase Authentication
     await user.updateDisplayName(name.trim());
     await user.reload();
 
     final updatedUser = _firebaseAuth.currentUser ?? user;
 
-    // Save user profile in Firestore
     await _firestore.collection('users').doc(updatedUser.uid).set({
       'uid': updatedUser.uid,
       'name': name.trim(),
       'email': updatedUser.email,
+      'gender': null,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -53,7 +52,8 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final credential = await _firebaseAuth.signInWithEmailAndPassword(
+    final credential =
+    await _firebaseAuth.signInWithEmailAndPassword(
       email: email.trim(),
       password: password,
     );
@@ -64,7 +64,6 @@ class AuthService {
       throw Exception('Unable to retrieve user information.');
     }
 
-    // Save or update user profile in Firestore
     await _firestore.collection('users').doc(user.uid).set({
       'uid': user.uid,
       'name': user.displayName ?? '',
@@ -74,6 +73,42 @@ class AuthService {
     }, SetOptions(merge: true));
 
     return credential;
+  }
+
+  // Check whether gender has been selected
+  Future<bool> hasSelectedGender(String uid) async {
+    final document =
+    await _firestore.collection('users').doc(uid).get();
+
+    final gender = document.data()?['gender'];
+
+    return gender == 'Male' || gender == 'Female';
+  }
+
+  Future<String?> getUserGender(String uid) async {
+    final document =
+    await _firestore.collection('users').doc(uid).get();
+
+    final gender = document.data()?['gender'];
+
+    if (gender == 'Male' || gender == 'Female') {
+      return gender as String;
+    }
+
+    return null;
+  }
+
+  Future<void> saveGender(String gender) async {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw Exception('User is not logged in.');
+    }
+
+    await _firestore.collection('users').doc(user.uid).set({
+      'gender': gender,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   // Logout

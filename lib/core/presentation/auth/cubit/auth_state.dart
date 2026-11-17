@@ -3,6 +3,7 @@ enum AuthStatus {
   initial,
   loading,
   authenticated,
+  needsGenderSelection,
   unauthenticated,
   error,
 }
@@ -12,12 +13,14 @@ class AuthState {
   final String? errorMessage;
   final String? userName;
   final String? userEmail;
+  final String? userGender;
 
   const AuthState({
     this.status = AuthStatus.initial,
     this.errorMessage,
     this.userName,
     this.userEmail,
+    this.userGender,
   });
 
   AuthState copyWith({
@@ -25,6 +28,7 @@ class AuthState {
     String? errorMessage,
     String? userName,
     String? userEmail,
+    String? userGender,
     bool clearError = false,
   }) {
     return AuthState(
@@ -33,6 +37,7 @@ class AuthState {
       clearError ? null : errorMessage ?? this.errorMessage,
       userName: userName ?? this.userName,
       userEmail: userEmail ?? this.userEmail,
+      userGender: userGender ?? this.userGender,
     );
   }
 }

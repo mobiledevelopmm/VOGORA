@@ -50,23 +50,23 @@ class _SplashPageState extends State<SplashPage>
     _navigateAfterSplash();
   }
 
+
   Future<void> _navigateAfterSplash() async {
-    // Show splash for 3 seconds.
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
     final authCubit = context.read<AuthCubit>();
 
-    // Check current authentication state.
     var authState = authCubit.state;
 
-    // Wait until Firebase restores the authentication state.
+    // Wait until Firebase restores authentication state
     if (authState.status == AuthStatus.initial ||
         authState.status == AuthStatus.loading) {
       authState = await authCubit.stream.firstWhere(
             (state) =>
         state.status == AuthStatus.authenticated ||
+            state.status == AuthStatus.needsGenderSelection ||
             state.status == AuthStatus.unauthenticated ||
             state.status == AuthStatus.error,
       );
@@ -74,13 +74,16 @@ class _SplashPageState extends State<SplashPage>
 
     if (!mounted) return;
 
-    // Navigate based on authentication status.
     if (authState.status == AuthStatus.authenticated) {
       context.go('/home');
+    } else if (authState.status ==
+        AuthStatus.needsGenderSelection) {
+      context.go('/gender-selection');
     } else {
       context.go('/login');
     }
   }
+
 
   @override
   void dispose() {

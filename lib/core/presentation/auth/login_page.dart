@@ -54,6 +54,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
+        if (state.status == AuthStatus.needsGenderSelection) {
+          context.go('/gender-selection');
+        }
+
         if (state.status == AuthStatus.authenticated) {
           context.go('/home');
         }
@@ -162,20 +166,11 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 32),
 
                           // Sign In Button
-                          AuthButton(
-                            title: 'SIGN IN',
-                            onPressed: isLoading ? () {} : _login,
-                          ),
-
-                          // Loading Indicator
-                          if (isLoading) ...[
-                            const SizedBox(height: 16),
-                            const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF91475B),
-                              ),
-                            ),
-                          ],
+                        AuthButton(
+                          title: 'SIGN IN',
+                          isLoading: isLoading,
+                          onPressed: _login,
+                        ),
 
                           const SizedBox(height: 28),
 

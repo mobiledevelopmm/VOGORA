@@ -1,3 +1,4 @@
+
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -26,19 +27,47 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   // Listen to Firebase Authentication changes
-  void _onAuthChanged(User? user) {
+  Future<void> _onAuthChanged(User? user) async {
     if (isClosed) return;
 
-    if (user != null) {
-      emit(AuthState(
-        status: AuthStatus.authenticated,
-        userName: user.displayName,
-        userEmail: user.email,
-      ));
-    } else {
+    if (user == null) {
       emit(const AuthState(
         status: AuthStatus.unauthenticated,
       ));
+      return;
+    }
+
+    await _checkUserGender(user);
+  }
+
+  // Check user gender from Firestore
+  Future<void> _checkUserGender(User user) async {
+    try {
+      final gender = await _authService.getUserGender(user.uid);
+
+      if (isClosed) return;
+
+      if (gender == null) {
+        emit(AuthState(
+          status: AuthStatus.needsGenderSelection,
+          userName: user.displayName,
+          userEmail: user.email,
+        ));
+      } else {
+        emit(AuthState(
+          status: AuthStatus.authenticated,
+          userName: user.displayName,
+          userEmail: user.email,
+          userGender: gender,
+        ));
+      }
+    } catch (_) {
+      if (!isClosed) {
+        emit(const AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Unable to load your profile. Please try again.',
+        ));
+      }
     }
   }
 
@@ -62,21 +91,23 @@ class AuthCubit extends Cubit<AuthState> {
 
       final user = _authService.currentUser;
 
-      emit(AuthState(
-        status: AuthStatus.authenticated,
-        userName: user?.displayName ?? name,
-        userEmail: user?.email ?? email,
-      ));
+      if (user != null && !isClosed) {
+        await _checkUserGender(user);
+      }
     } on FirebaseAuthException catch (e) {
-      emit(AuthState(
-        status: AuthStatus.error,
-        errorMessage: _getErrorMessage(e.code),
-      ));
+      if (!isClosed) {
+        emit(AuthState(
+          status: AuthStatus.error,
+          errorMessage: _getErrorMessage(e.code),
+        ));
+      }
     } catch (_) {
-      emit(const AuthState(
-        status: AuthStatus.error,
-        errorMessage: 'Something went wrong. Please try again.',
-      ));
+      if (!isClosed) {
+        emit(const AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Something went wrong. Please try again.',
+        ));
+      }
     }
   }
 
@@ -98,21 +129,53 @@ class AuthCubit extends Cubit<AuthState> {
 
       final user = _authService.currentUser;
 
-      emit(AuthState(
-        status: AuthStatus.authenticated,
-        userName: user?.displayName,
-        userEmail: user?.email ?? email,
-      ));
+      if (user != null && !isClosed) {
+        await _checkUserGender(user);
+      }
     } on FirebaseAuthException catch (e) {
-      emit(AuthState(
-        status: AuthStatus.error,
-        errorMessage: _getErrorMessage(e.code),
-      ));
+      if (!isClosed) {
+        emit(AuthState(
+          status: AuthStatus.error,
+          errorMessage: _getErrorMessage(e.code),
+        ));
+      }
     } catch (_) {
-      emit(const AuthState(
-        status: AuthStatus.error,
-        errorMessage: 'Something went wrong. Please try again.',
-      ));
+      if (!isClosed) {
+        emit(const AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Something went wrong. Please try again.',
+        ));
+      }
+    }
+  }
+
+  // Save selected gender
+  Future<void> saveGender(String gender) async {
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      clearError: true,
+    ));
+
+    try {
+      await _authService.saveGender(gender);
+
+      final user = _authService.currentUser;
+
+      if (user != null && !isClosed) {
+        emit(AuthState(
+          status: AuthStatus.authenticated,
+          userName: user.displayName,
+          userEmail: user.email,
+          userGender: gender,
+        ));
+      }
+    } catch (_) {
+      if (!isClosed) {
+        emit(const AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Unable to save your gender. Please try again.',
+        ));
+      }
     }
   }
 
@@ -126,14 +189,18 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _authService.logout();
 
-      emit(const AuthState(
-        status: AuthStatus.unauthenticated,
-      ));
+      if (!isClosed) {
+        emit(const AuthState(
+          status: AuthStatus.unauthenticated,
+        ));
+      }
     } catch (_) {
-      emit(const AuthState(
-        status: AuthStatus.error,
-        errorMessage: 'Unable to log out. Please try again.',
-      ));
+      if (!isClosed) {
+        emit(const AuthState(
+          status: AuthStatus.error,
+          errorMessage: 'Unable to log out. Please try again.',
+        ));
+      }
     }
   }
 
@@ -142,27 +209,20 @@ class AuthCubit extends Cubit<AuthState> {
     switch (code) {
       case 'email-already-in-use':
         return 'This email is already registered.';
-
       case 'invalid-email':
         return 'Please enter a valid email address.';
-
       case 'weak-password':
         return 'Password is too weak. Use at least 6 characters.';
-
       case 'user-not-found':
       case 'wrong-password':
       case 'invalid-credential':
         return 'Incorrect email or password.';
-
       case 'user-disabled':
         return 'This account has been disabled.';
-
       case 'too-many-requests':
         return 'Too many attempts. Please try again later.';
-
       case 'network-request-failed':
         return 'Please check your internet connection.';
-
       default:
         return 'Authentication failed. Please try again.';
     }

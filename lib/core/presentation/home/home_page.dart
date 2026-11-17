@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../auth/cubit/auth_cubit.dart';
 import 'styled_for_you/styled_for_you_page.dart';
 import 'trending_styles/trending_styles_page.dart';
 import '../auth/widgets/fashion_background.dart';
@@ -18,17 +20,22 @@ class HomePage extends StatelessWidget {
         required bool isTrending,
         String? category,
       }) {
+    final gender =
+        context.read<AuthCubit>().state.userGender ?? 'Female';
+
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
         builder: (_) {
           if (isTrending) {
             return TrendingStylesPage(
               initialCategory: category,
+              gender: gender,
             );
           }
 
           return StyledForYouPage(
             initialCategory: category,
+            gender: gender,
           );
         },
       ),
