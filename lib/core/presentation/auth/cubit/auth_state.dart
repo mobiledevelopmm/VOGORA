@@ -14,6 +14,7 @@ class AuthState {
   final String? userName;
   final String? userEmail;
   final String? userGender;
+  final int? userAge;
 
   const AuthState({
     this.status = AuthStatus.initial,
@@ -21,6 +22,7 @@ class AuthState {
     this.userName,
     this.userEmail,
     this.userGender,
+    this.userAge,
   });
 
   AuthState copyWith({
@@ -29,7 +31,9 @@ class AuthState {
     String? userName,
     String? userEmail,
     String? userGender,
+    int? userAge,
     bool clearError = false,
+    bool clearAge = false,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -38,6 +42,7 @@ class AuthState {
       userName: userName ?? this.userName,
       userEmail: userEmail ?? this.userEmail,
       userGender: userGender ?? this.userGender,
+      userAge: clearAge ? null : userAge ?? this.userAge,
     );
   }
 }

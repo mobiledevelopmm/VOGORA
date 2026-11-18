@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/services/auth_service.dart';
@@ -40,10 +41,11 @@ class AuthCubit extends Cubit<AuthState> {
     await _checkUserGender(user);
   }
 
-  // Check user gender from Firestore
+
   Future<void> _checkUserGender(User user) async {
     try {
       final gender = await _authService.getUserGender(user.uid);
+      final age = await _authService.getUserAge(user.uid);
 
       if (isClosed) return;
 
@@ -52,6 +54,7 @@ class AuthCubit extends Cubit<AuthState> {
           status: AuthStatus.needsGenderSelection,
           userName: user.displayName,
           userEmail: user.email,
+          userAge: age,
         ));
       } else {
         emit(AuthState(
@@ -59,6 +62,7 @@ class AuthCubit extends Cubit<AuthState> {
           userName: user.displayName,
           userEmail: user.email,
           userGender: gender,
+          userAge: age,
         ));
       }
     } catch (_) {
@@ -174,6 +178,62 @@ class AuthCubit extends Cubit<AuthState> {
         emit(const AuthState(
           status: AuthStatus.error,
           errorMessage: 'Unable to save your gender. Please try again.',
+        ));
+      }
+    }
+  }
+
+  Future<void> updatePersonalInfo({
+    required String name,
+    required String gender,
+    int? age,
+  }) async {
+    final previousState = state;
+
+    emit(state.copyWith(
+      status: AuthStatus.loading,
+      clearError: true,
+    ));
+
+    try {
+      await _authService.updatePersonalInfo(
+        name: name,
+        gender: gender,
+        age: age,
+      );
+
+      final user = _authService.currentUser;
+
+      if (user != null && !isClosed) {
+        // Reload saved information from Firestore.
+        final savedGender =
+        await _authService.getUserGender(user.uid);
+
+        final savedAge =
+        await _authService.getUserAge(user.uid);
+
+        await user.reload();
+
+        final updatedUser = _authService.currentUser;
+
+        if (!isClosed) {
+          emit(AuthState(
+            status: AuthStatus.authenticated,
+            userName: updatedUser?.displayName ?? name,
+            userEmail: updatedUser?.email,
+            userGender: savedGender ?? gender,
+            userAge: savedAge,
+          ));
+        }
+      }
+    } catch (e) {
+      debugPrint('Update Personal Info Error: $e');
+
+      if (!isClosed) {
+        emit(previousState.copyWith(
+          status: AuthStatus.authenticated,
+          errorMessage:
+          'Unable to update your information. Please try again.',
         ));
       }
     }

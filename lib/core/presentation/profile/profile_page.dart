@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:untitled/core/presentation/profile/pages/personal_information_page.dart';
 
 import '../auth/cubit/auth_cubit.dart';
 import '../auth/cubit/auth_state.dart';
@@ -47,7 +48,14 @@ class ProfilePage extends StatelessWidget {
                     icon: Icons.person_outline_rounded,
                     title: 'Personal Information',
                     subtitle: 'Your personal details and account information',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const PersonalInformationPage(),
+                        ),
+                      );
+                    },
                   ),
                   _buildMenuCard(
                     icon: Icons.palette_outlined,

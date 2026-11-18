@@ -98,6 +98,8 @@ class AuthService {
     return null;
   }
 
+
+
   Future<void> saveGender(String gender) async {
     final user = _firebaseAuth.currentUser;
 
@@ -109,6 +111,71 @@ class AuthService {
       'gender': gender,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+  }
+
+
+  Future<int?> getUserAge(String uid) async {
+    final document =
+    await _firestore.collection('users').doc(uid).get();
+
+    final age = document.data()?['age'];
+
+    if (age is int) return age;
+    if (age is String) return int.tryParse(age);
+
+    return null;
+  }
+
+  Future<void> updatePersonalInfo({
+    required String name,
+    required String gender,
+    int? age,
+  }) async {
+    final user = _firebaseAuth.currentUser;
+
+    if (user == null) {
+      throw Exception('User is not logged in.');
+    }
+
+    final updatedName = name.trim();
+
+    if (updatedName.isEmpty) {
+      throw Exception('Name cannot be empty.');
+    }
+
+    if (gender != 'Male' && gender != 'Female') {
+      throw Exception('Please select a valid gender.');
+    }
+
+    if (age != null && (age < 1 || age > 120)) {
+      throw Exception('Please enter a valid age.');
+    }
+
+    await user.updateDisplayName(updatedName);
+    await user.reload();
+
+    final updatedUser = _firebaseAuth.currentUser;
+
+    if (updatedUser == null) {
+      throw Exception('Unable to update user information.');
+    }
+
+    final data = <String, dynamic>{
+      'name': updatedName,
+      'gender': gender,
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+
+    if (age == null) {
+      data['age'] = FieldValue.delete();
+    } else {
+      data['age'] = age;
+    }
+
+    await _firestore.collection('users').doc(updatedUser.uid).set(
+      data,
+      SetOptions(merge: true),
+    );
   }
 
   // Logout
