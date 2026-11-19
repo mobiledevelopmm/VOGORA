@@ -16,12 +16,25 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomePage(),
-    WardrobePage(),
-    SavedOutfitsPage(),
-    ProfilePage(),
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pages = [
+      HomePage(onOpenProfile: _openProfile),
+      const WardrobePage(),
+      const SavedOutfitsPage(),
+      const ProfilePage(),
+    ];
+  }
+
+  void _openProfile() {
+    setState(() {
+      _currentIndex = 3;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

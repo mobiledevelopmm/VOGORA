@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../data/models/outfit_item_model.dart';
 import '../../auth/widgets/fashion_background.dart';
-import '../models/outfit_item.dart';
 
 class OutfitDetailPage extends StatelessWidget {
   final OutfitItem outfit;
@@ -26,7 +26,6 @@ class OutfitDetailPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 8, 20, 12),
@@ -39,7 +38,6 @@ class OutfitDetailPage extends StatelessWidget {
                         color: berry,
                       ),
                     ),
-                    const SizedBox(width: 5),
                     const Text(
                       'Outfit Details',
                       style: TextStyle(
@@ -62,15 +60,11 @@ class OutfitDetailPage extends StatelessWidget {
                         child: AspectRatio(
                           aspectRatio: 0.78,
                           child: Image.network(
-                            outfit.imageUrl,
+                            outfit.imageURL,
                             width: double.infinity,
                             fit: BoxFit.cover,
-                            loadingBuilder: (
-                                context,
-                                child,
-                                loadingProgress,
-                                ) {
-                              if (loadingProgress == null) return child;
+                            loadingBuilder: (context, child, progress) {
+                              if (progress == null) return child;
 
                               return const Center(
                                 child: CircularProgressIndicator(
@@ -80,7 +74,7 @@ class OutfitDetailPage extends StatelessWidget {
                             },
                             errorBuilder: (context, error, stackTrace) {
                               return Container(
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: Colors.white,
                                 child: const Center(
                                   child: Icon(
                                     Icons.image_not_supported_outlined,
@@ -123,7 +117,9 @@ class OutfitDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        outfit.description,
+                        outfit.description.isEmpty
+                            ? 'Explore this look and discover your personal style.'
+                            : outfit.description,
                         style: const TextStyle(
                           fontSize: 14,
                           height: 1.6,

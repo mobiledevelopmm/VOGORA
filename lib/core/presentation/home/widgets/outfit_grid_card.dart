@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../models/outfit_item.dart';
+import '../../../data/models/outfit_item_model.dart';
 
 class OutfitGridCard extends StatelessWidget {
   final OutfitItem item;
@@ -14,6 +14,7 @@ class OutfitGridCard extends StatelessWidget {
   static const Color berry = Color(0xFF91475B);
   static const Color espresso = Color(0xFF29211F);
   static const Color secondary = Color(0xFF6F625D);
+  static const Color imageBackground = Color(0xFFF1D8D8);
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +25,16 @@ class OutfitGridCard extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(17),
             child: Image.network(
-              item.imageUrl,
+              item.imageURL,
               width: double.infinity,
               fit: BoxFit.cover,
               loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
+                if (progress == null) {
+                  return child;
+                }
 
                 return Container(
-                  color: const Color(0xFFF1D8D8),
+                  color: imageBackground,
                   alignment: Alignment.center,
                   child: const CircularProgressIndicator(
                     color: berry,
@@ -39,10 +42,10 @@ class OutfitGridCard extends StatelessWidget {
                   ),
                 );
               },
-              errorBuilder: (_, __, ___) {
+              errorBuilder: (context, error, stackTrace) {
                 return Container(
                   width: double.infinity,
-                  color: const Color(0xFFF1D8D8),
+                  color: imageBackground,
                   alignment: Alignment.center,
                   child: const Icon(
                     Icons.checkroom_rounded,
@@ -54,9 +57,7 @@ class OutfitGridCard extends StatelessWidget {
             ),
           ),
         ),
-
         const SizedBox(height: 8),
-
         Text(
           item.title,
           maxLines: 1,
@@ -67,9 +68,7 @@ class OutfitGridCard extends StatelessWidget {
             color: espresso,
           ),
         ),
-
         const SizedBox(height: 3),
-
         Text(
           item.description,
           maxLines: 2,

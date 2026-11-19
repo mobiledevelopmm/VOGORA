@@ -1,153 +1,50 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../../data/models/outfit_item_model.dart';
+import '../../../data/datasources/services/outfit_service.dart';
 import '../../auth/widgets/fashion_background.dart';
-import '../models/outfit_item.dart';
-import '../widgets/category_styles_page.dart';
 import '../widgets/outfit_detail_page.dart';
 import '../widgets/outfit_grid_card.dart';
 
 class StyledForYouPage extends StatefulWidget {
-  final String? initialCategory;
   final String gender;
+  final String? initialCategory;
 
   const StyledForYouPage({
     super.key,
-    this.initialCategory,
     required this.gender,
+    this.initialCategory,
   });
 
   @override
-  State<StyledForYouPage> createState() =>
-      _StyledForYouPageState();
+  State<StyledForYouPage> createState() => _StyledForYouPageState();
 }
 
 class _StyledForYouPageState extends State<StyledForYouPage> {
-  static const Color coral = Color(0xFFFF5E62);
   static const Color berry = Color(0xFF91475B);
   static const Color espresso = Color(0xFF29211F);
 
   final List<String> categories = [
+    'All',
     'Casual',
     'Korean',
     'Streetwear',
     'Formal',
-    'Sporty',
+    'Minimal',
+    'Vintage',
   ];
+
   late String selectedCategory;
+  late final OutfitService _outfitService;
 
   @override
   void initState() {
     super.initState();
-
-    selectedCategory = widget.initialCategory != null &&
-        categories.contains(widget.initialCategory)
-        ? widget.initialCategory!
-        : 'Casual';
+    selectedCategory = widget.initialCategory ?? 'All';
+    _outfitService = OutfitService(FirebaseFirestore.instance);
   }
-
-  final Map<String, List<OutfitItem>> outfitsByCategory = {
-    'Casual': [
-      OutfitItem(
-        title: 'Casual Chic',
-        description: 'Simple and comfortable everyday outfit',
-        imageUrl:
-        'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=700',
-      ),
-      OutfitItem(
-        title: 'Relaxed Look',
-        description: 'A relaxed and effortless combination',
-        imageUrl:
-        'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700',
-      ),
-      OutfitItem(
-        title: 'Everyday Fashion',
-        description: 'Easy pieces for daily wear',
-        imageUrl:
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700',
-      ),
-    ],
-    'Korean': [
-      OutfitItem(
-        title: 'Korean Minimal',
-        description: 'Clean and minimal Korean fashion',
-        imageUrl:
-        'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700',
-      ),
-      OutfitItem(
-        title: 'Soft Korean Look',
-        description: 'Soft colors and elegant silhouettes',
-        imageUrl:
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700',
-      ),
-      OutfitItem(
-        title: 'Modern Korean',
-        description: 'Modern everyday Korean outfit',
-        imageUrl:
-        'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700',
-      ),
-    ],
-    'Streetwear': [
-      OutfitItem(
-        title: 'Urban Street',
-        description: 'Bold street-inspired outfit',
-        imageUrl:
-        'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700',
-      ),
-      OutfitItem(
-        title: 'Street Chic',
-        description: 'Comfortable and confident street style',
-        imageUrl:
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700',
-      ),
-      OutfitItem(
-        title: 'Modern Street',
-        description: 'Modern urban fashion inspiration',
-        imageUrl:
-        'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=700',
-      ),
-    ],
-    'Formal': [
-      OutfitItem(
-        title: 'Elegant Formal',
-        description: 'A polished and elegant appearance',
-        imageUrl:
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=700',
-      ),
-      OutfitItem(
-        title: 'Office Chic',
-        description: 'Smart and sophisticated outfit',
-        imageUrl:
-        'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700',
-      ),
-      OutfitItem(
-        title: 'Classic Elegance',
-        description: 'Timeless formal fashion',
-        imageUrl:
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700',
-      ),
-    ],
-    'Sporty': [
-      OutfitItem(
-        title: 'Sporty Casual',
-        description: 'Comfortable activewear inspiration',
-        imageUrl:
-        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=700',
-      ),
-      OutfitItem(
-        title: 'Active Look',
-        description: 'Easy and energetic sporty style',
-        imageUrl:
-        'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700',
-      ),
-      OutfitItem(
-        title: 'Athleisure',
-        description: 'Sporty pieces for everyday wear',
-        imageUrl:
-        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=700',
-      ),
-    ],
-  };
 
   void _openOutfitDetail(OutfitItem outfit) {
     Navigator.push(
@@ -155,7 +52,7 @@ class _StyledForYouPageState extends State<StyledForYouPage> {
       MaterialPageRoute(
         builder: (_) => OutfitDetailPage(
           outfit: outfit,
-          categoryName: selectedCategory,
+          categoryName: outfit.category,
         ),
       ),
     );
@@ -163,178 +60,139 @@ class _StyledForYouPageState extends State<StyledForYouPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentOutfits =
-        outfitsByCategory[selectedCategory] ?? [];
-
     return FashionBackground(
       overlayOpacity: 0.88,
-      child: Material(
-        color: Colors.transparent,
-        child: SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // App Bar
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  12,
-                  8,
-                  20,
-                  16,
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: berry,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    const Expanded(
-                      child: Text(
-                        'Styled for You',
-                        style: TextStyle(
-                          fontSize: 21,
-                          fontWeight: FontWeight.w800,
-                          color: espresso,
-                        ),
-                      ),
-                    ),
-                  ],
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 6),
+                child: Text(
+                  'Styled For You',
+                  style: TextStyle(
+                    color: espresso,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
-
-              // Description
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  'Discover outfits that match your personal style.',
+                  'Discover outfits that match your style.',
                   style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF6F625D),
+                    color: Color(0xFF796B65),
+                    fontSize: 13,
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Category Buttons
               SizedBox(
-                height: 43,
+                height: 42,
                 child: ListView.separated(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
-                  separatorBuilder: (_, __) =>
-                  const SizedBox(width: 9),
+                  separatorBuilder: (_, _) => const SizedBox(width: 9),
                   itemBuilder: (context, index) {
                     final category = categories[index];
-                    final isSelected =
-                        selectedCategory == category;
+                    final isSelected = selectedCategory == category;
 
-                    return ChoiceChip(
-                      label: Text(category),
-                      selected: isSelected,
-                      showCheckmark: false,
-                      onSelected: (_) {
+                    return GestureDetector(
+                      onTap: () {
                         setState(() {
                           selectedCategory = category;
                         });
                       },
-                      backgroundColor:
-                      Colors.white.withValues(alpha: 0.8),
-                      selectedColor: berry,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                            ? Colors.white
-                            : espresso,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                      ),
-                      side: BorderSide(
-                        color: isSelected
-                            ? berry
-                            : berry.withValues(alpha: 0.15),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 17,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isSelected ? berry : Colors.white,
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(
+                            color: isSelected
+                                ? berry
+                                : const Color(0xFFE8DAD5),
+                          ),
+                        ),
+                        child: Text(
+                          category,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : espresso,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
                     );
                   },
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              // Selected Category
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      selectedCategory,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: espresso,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: coral.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        '${currentOutfits.length} Looks',
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: berry,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              // Outfit Grid
+              const SizedBox(height: 18),
               Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(
-                    20,
-                    0,
-                    20,
-                    25,
+                child: StreamBuilder<List<OutfitItem>>(
+                  stream: _outfitService.getOutfits(
+                    gender: widget.gender,
+                    type: 'styled_for_you',
                   ),
-                  itemCount: currentOutfits.length,
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.66,
-                  ),
-                  itemBuilder: (context, index) {
-                    final outfit = currentOutfits[index];
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: berry),
+                      );
+                    }
 
-                    return GestureDetector(
-                      onTap: () {
-                        _openOutfitDetail(outfit);
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text('Something went wrong. Please try again.'),
+                      );
+                    }
+
+                    final outfits = snapshot.data ?? [];
+
+                    final filteredOutfits = selectedCategory == 'All'
+                        ? outfits
+                        : outfits.where((outfit) {
+                      return outfit.category.toLowerCase() ==
+                          selectedCategory.toLowerCase();
+                    }).toList();
+
+                    if (filteredOutfits.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No outfits available yet.',
+                          style: TextStyle(
+                            color: espresso,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 25),
+                      itemCount: filteredOutfits.length,
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 13,
+                        mainAxisSpacing: 15,
+                        childAspectRatio: 0.68,
+                      ),
+                      itemBuilder: (context, index) {
+                        final outfit = filteredOutfits[index];
+
+                        return GestureDetector(
+                          onTap: () => _openOutfitDetail(outfit),
+                          child: OutfitGridCard(item: outfit),
+                        );
                       },
-                      child: OutfitGridCard(item: outfit),
                     );
                   },
                 ),

@@ -1,22 +1,50 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../../data/models/outfit_item_model.dart';
+import '../../../data/datasources/services/outfit_service.dart';
 import '../../auth/widgets/fashion_background.dart';
-import '../models/outfit_item.dart';
+import 'outfit_detail_page.dart';
 import 'outfit_grid_card.dart';
 
-class CategoryStylesPage extends StatelessWidget {
-  final String categoryName;
-  final List<OutfitItem> outfits;
+class CategoryStylesPage extends StatefulWidget {
+  final String category;
+  final String gender;
 
   const CategoryStylesPage({
     super.key,
-    required this.categoryName,
-    required this.outfits,
+    required this.category,
+    required this.gender,
   });
 
-  static const Color coral = Color(0xFFFF5E62);
+  @override
+  State<CategoryStylesPage> createState() => _CategoryStylesPageState();
+}
+
+class _CategoryStylesPageState extends State<CategoryStylesPage> {
+  static const Color berry = Color(0xFF91475B);
   static const Color espresso = Color(0xFF29211F);
+
+  late final OutfitService _outfitService;
+
+  @override
+  void initState() {
+    super.initState();
+    _outfitService = OutfitService(FirebaseFirestore.instance);
+  }
+
+  void _openOutfitDetail(OutfitItem outfit) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OutfitDetailPage(
+          outfit: outfit,
+          categoryName: outfit.category,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,70 +56,84 @@ class CategoryStylesPage extends StatelessWidget {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 20, 16),
+                padding: const EdgeInsets.fromLTRB(12, 8, 20, 12),
                 child: Row(
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: espresso,
+                        Icons.arrow_back_ios_new_rounded,
+                        color: berry,
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        categoryName,
+                        widget.category,
                         style: const TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.bold,
                           color: espresso,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Explore $categoryName outfits and get inspired.',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: espresso,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
               Expanded(
-                child: outfits.isEmpty
-                    ? const Center(
-                  child: Text('No outfits available yet.'),
-                )
-                    : GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(
-                    20,
-                    0,
-                    20,
-                    24,
+                child: StreamBuilder<List<OutfitItem>>(
+                  stream: _outfitService.getOutfits(
+                    gender: widget.gender,
+                    type: 'styled_for_you',
                   ),
-                  itemCount: outfits.length,
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 0.65,
-                  ),
-                  itemBuilder: (context, index) {
-                    return OutfitGridCard(
-                      item: outfits[index],
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: berry),
+                      );
+                    }
+
+                    if (snapshot.hasError) {
+                      return const Center(
+                        child: Text('Unable to load outfits.'),
+                      );
+                    }
+
+                    final outfits = (snapshot.data ?? [])
+                        .where(
+                          (outfit) =>
+                      outfit.category.toLowerCase() ==
+                          widget.category.toLowerCase(),
+                    )
+                        .toList();
+
+                    if (outfits.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No outfits found in this category.',
+                          style: TextStyle(color: espresso),
+                        ),
+                      );
+                    }
+
+                    return GridView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 25),
+                      itemCount: outfits.length,
+                      gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 13,
+                        mainAxisSpacing: 15,
+                        childAspectRatio: 0.68,
+                      ),
+                      itemBuilder: (context, index) {
+                        final outfit = outfits[index];
+
+                        return GestureDetector(
+                          onTap: () => _openOutfitDetail(outfit),
+                          child: OutfitGridCard(item: outfit),
+                        );
+                      },
                     );
                   },
                 ),

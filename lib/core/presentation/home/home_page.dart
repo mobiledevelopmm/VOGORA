@@ -3,12 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../auth/cubit/auth_cubit.dart';
+import '../auth/widgets/fashion_background.dart';
 import 'styled_for_you/styled_for_you_page.dart';
 import 'trending_styles/trending_styles_page.dart';
-import '../auth/widgets/fashion_background.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final VoidCallback onOpenProfile;
+
+  const HomePage({
+    super.key,
+    required this.onOpenProfile,
+  });
 
   static const Color coral = Color(0xFFFF5E62);
   static const Color berry = Color(0xFF91475B);
@@ -28,14 +33,13 @@ class HomePage extends StatelessWidget {
         builder: (_) {
           if (isTrending) {
             return TrendingStylesPage(
-              initialCategory: category,
               gender: gender,
             );
           }
 
           return StyledForYouPage(
-            initialCategory: category,
             gender: gender,
+            initialCategory: category,
           );
         },
       ),
@@ -87,7 +91,7 @@ class HomePage extends StatelessWidget {
                     radius: 22,
                     backgroundColor: const Color(0xFFF1D8D8),
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: onOpenProfile,
                       icon: const Icon(
                         Icons.person_outline_rounded,
                         color: berry,
@@ -278,7 +282,6 @@ class HomePage extends StatelessWidget {
                       onTap: () => _openCollection(
                         context,
                         isTrending: true,
-                        category: 'Old Money',
                       ),
                     ),
                     const SizedBox(width: 13),
@@ -290,7 +293,6 @@ class HomePage extends StatelessWidget {
                       onTap: () => _openCollection(
                         context,
                         isTrending: true,
-                        category: 'Coquette',
                       ),
                     ),
                   ],
@@ -347,11 +349,11 @@ class HomePage extends StatelessWidget {
                 'See All',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 11,
+                  fontSize: 12,
                 ),
               ),
               SizedBox(width: 4),
-              Icon(Icons.arrow_forward_ios_rounded, size: 11),
+              Icon(Icons.arrow_forward_ios_rounded, size: 12),
             ],
           ),
         ),
@@ -360,7 +362,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// Home Page Preview Card
 class _PreviewCard extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -388,14 +389,16 @@ class _PreviewCard extends StatelessWidget {
               Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: const Color(0xFFF1D8D8),
-                  child: const Icon(
-                    Icons.checkroom_rounded,
-                    size: 45,
-                    color: HomePage.berry,
-                  ),
-                ),
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: const Color(0xFFF1D8D8),
+                    child: const Icon(
+                      Icons.checkroom_rounded,
+                      size: 45,
+                      color: HomePage.berry,
+                    ),
+                  );
+                },
               ),
               const DecoratedBox(
                 decoration: BoxDecoration(
