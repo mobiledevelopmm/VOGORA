@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../auth/cubit/auth_cubit.dart';
 import '../auth/widgets/fashion_background.dart';
+import 'choose undertone/choose_undertone_page.dart';
 import 'styled_for_you/styled_for_you_page.dart';
 import 'trending_styles/trending_styles_page.dart';
 
@@ -41,6 +42,14 @@ class HomePage extends StatelessWidget {
             initialCategory: category,
           );
         },
+      ),
+    );
+  }
+
+  void _openUndertonePage(BuildContext context) {
+    Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        builder: (_) => const ChooseUndertonePage(),
       ),
     );
   }
@@ -161,10 +170,7 @@ class HomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 13),
                           ElevatedButton(
-                            onPressed: () => _openCollection(
-                              context,
-                              isTrending: false,
-                            ),
+                            onPressed: () => _openUndertonePage(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: berry,
                               foregroundColor: Colors.white,
