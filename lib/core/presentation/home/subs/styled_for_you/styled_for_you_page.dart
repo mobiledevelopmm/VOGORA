@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../../data/models/outfit_item_model.dart';
-import '../../../data/datasources/services/outfit_service.dart';
-import '../../auth/widgets/fashion_background.dart';
-import '../widgets/outfit_detail_page.dart';
-import '../widgets/outfit_grid_card.dart';
-
+import '../../../../data/datasources/services/outfit_service.dart';
+import '../../../../data/models/outfit_item_model.dart';
+import '../../../auth/widgets/fashion_background.dart';
+import '../../widgets/outfit_detail_page.dart';
+import '../../widgets/outfit_grid_card.dart';
 class StyledForYouPage extends StatefulWidget {
   final String gender;
   final String? initialCategory;

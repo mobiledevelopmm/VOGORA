@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../auth/cubit/auth_cubit.dart';
-import '../../auth/widgets/fashion_background.dart';
+import '../../../auth/cubit/auth_cubit.dart';
+import '../../../auth/widgets/fashion_background.dart';
 import 'body_shape_result_page.dart';
 
 class BodyMeasurementsPage extends StatefulWidget {

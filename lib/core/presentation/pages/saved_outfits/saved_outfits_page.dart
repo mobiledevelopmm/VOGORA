@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../auth/widgets/fashion_background.dart';
+import '../../auth/widgets/fashion_background.dart';
 
 class SavedOutfitsPage extends StatelessWidget {
   const SavedOutfitsPage({super.key});

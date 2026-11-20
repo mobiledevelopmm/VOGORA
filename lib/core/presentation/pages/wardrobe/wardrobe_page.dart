@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../auth/widgets/fashion_background.dart';
+import '../../auth/widgets/fashion_background.dart';
 
 class WardrobePage extends StatelessWidget {
   const WardrobePage({super.key});

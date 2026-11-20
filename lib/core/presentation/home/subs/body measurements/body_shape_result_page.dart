@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../auth/widgets/fashion_background.dart';
+import '../../../auth/widgets/fashion_background.dart';
 
 class BodyShapeResultPage extends StatelessWidget {
   final String bodyShape;

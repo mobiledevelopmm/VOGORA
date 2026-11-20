@@ -4,8 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/data/services/auth_service.dart';
 import 'core/presentation/auth/cubit/auth_cubit.dart';
-import 'core/router/app_router.dart';
-import 'core/theme/app_theme.dart';
+import 'core/presentation/home/theme/app_theme.dart';
+import 'core/presentation/router/app_router.dart';
 
 class VogoraApp extends StatelessWidget {
   const VogoraApp({super.key});

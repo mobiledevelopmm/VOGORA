@@ -1,10 +1,9 @@
-
 import 'package:flutter/material.dart';
+import 'package:untitled/core/presentation/pages/profile/profile_page.dart';
+import 'package:untitled/core/presentation/pages/saved_outfits/saved_outfits_page.dart';
+import 'package:untitled/core/presentation/pages/wardrobe/wardrobe_page.dart';
 
 import 'home/home_page.dart';
-import 'wardrobe/wardrobe_page.dart';
-import 'saved_outfits/saved_outfits_page.dart';
-import 'profile/profile_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
