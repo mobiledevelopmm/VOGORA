@@ -43,6 +43,11 @@ class OutfitGridCard extends StatelessWidget {
                 );
               },
               errorBuilder: (context, error, stackTrace) {
+                debugPrint('========== IMAGE ERROR ==========');
+                debugPrint('Image URL: ${item.imageURL}');
+                debugPrint('Error: $error');
+                debugPrint('=================================');
+
                 return Container(
                   width: double.infinity,
                   color: imageBackground,
