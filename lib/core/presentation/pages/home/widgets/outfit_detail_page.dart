@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
-
-import '../../../data/models/outfit_item_model.dart';
+import '../../../../data/models/outfit_item_model.dart';
 import '../../auth/widgets/fashion_background.dart';
 
 class OutfitDetailPage extends StatelessWidget {

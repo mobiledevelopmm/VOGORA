@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:untitled/core/presentation/auth/widgets/fashion_background.dart';
+import 'package:untitled/core/presentation/pages/auth/widgets/fashion_background.dart';
 
 import 'cubit/auth_cubit.dart';
 import 'cubit/auth_state.dart';

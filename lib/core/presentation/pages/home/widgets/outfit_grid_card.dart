@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 
-import '../../../data/models/outfit_item_model.dart';
+import '../../../../data/models/outfit_item_model.dart';
 
 class OutfitGridCard extends StatelessWidget {
   final OutfitItem item;

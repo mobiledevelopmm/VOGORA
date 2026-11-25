@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:untitled/core/presentation/home/subs/choose%20undertone/choose_undertone_page.dart';
-import 'package:untitled/core/presentation/home/subs/styled_for_you/styled_for_you_page.dart';
-import 'package:untitled/core/presentation/home/subs/trending_styles/trending_styles_page.dart';
+import 'package:untitled/core/presentation/pages/home/subs/choose%20undertone/choose_undertone_page.dart';
+import 'package:untitled/core/presentation/pages/home/subs/styled_for_you/styled_for_you_page.dart';
+import 'package:untitled/core/presentation/pages/home/subs/trending_styles/trending_styles_page.dart';
 
 import '../auth/cubit/auth_cubit.dart';
 import '../auth/widgets/fashion_background.dart';

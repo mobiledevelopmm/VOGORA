@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../pages/constants/app_colors.dart';
-import '../../pages/constants/app_sizes.dart';
+import '../../resource/constants/app_colors.dart';
+import '../../resource/constants/app_sizes.dart';
 import 'app_text_styles.dart';
 
 class LightTheme {

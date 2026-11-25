@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/data/services/auth_service.dart';
-import 'core/presentation/auth/cubit/auth_cubit.dart';
-import 'core/presentation/home/theme/app_theme.dart';
+import 'core/presentation/design_system/theme/app_theme.dart';
+import 'core/presentation/pages/auth/cubit/auth_cubit.dart';
 import 'core/presentation/router/app_router.dart';
 
 class VogoraApp extends StatelessWidget {

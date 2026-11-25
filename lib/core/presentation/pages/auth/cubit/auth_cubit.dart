@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../data/services/auth_service.dart';
+import '../../../../data/services/auth_service.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {

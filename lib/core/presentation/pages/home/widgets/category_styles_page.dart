@@ -4,23 +4,25 @@ import 'package:flutter/material.dart';
 
 import '../../../../data/datasources/services/outfit_service.dart';
 import '../../../../data/models/outfit_item_model.dart';
-import '../../../auth/widgets/fashion_background.dart';
-import '../../widgets/outfit_detail_page.dart';
-import '../../widgets/outfit_grid_card.dart';
+import '../../auth/widgets/fashion_background.dart';
+import 'outfit_detail_page.dart';
+import 'outfit_grid_card.dart';
 
-class TrendingStylesPage extends StatefulWidget {
+class CategoryStylesPage extends StatefulWidget {
+  final String category;
   final String gender;
 
-  const TrendingStylesPage({
+  const CategoryStylesPage({
     super.key,
+    required this.category,
     required this.gender,
   });
 
   @override
-  State<TrendingStylesPage> createState() => _TrendingStylesPageState();
+  State<CategoryStylesPage> createState() => _CategoryStylesPageState();
 }
 
-class _TrendingStylesPageState extends State<TrendingStylesPage> {
+class _CategoryStylesPageState extends State<CategoryStylesPage> {
   static const Color berry = Color(0xFF91475B);
   static const Color espresso = Color(0xFF29211F);
 
@@ -52,35 +54,36 @@ class _TrendingStylesPageState extends State<TrendingStylesPage> {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 22, 20, 6),
-                child: Text(
-                  'Trending Styles',
-                  style: TextStyle(
-                    color: espresso,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                  ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 8, 20, 12),
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: berry,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        widget.category,
+                        style: const TextStyle(
+                          color: espresso,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Text(
-                  'Explore popular looks and fresh inspiration.',
-                  style: TextStyle(
-                    color: Color(0xFF796B65),
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 22),
               Expanded(
                 child: StreamBuilder<List<OutfitItem>>(
                   stream: _outfitService.getOutfits(
                     gender: widget.gender,
-                    type: 'trending',
+                    type: 'styled_for_you',
                   ),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState ==
@@ -92,26 +95,29 @@ class _TrendingStylesPageState extends State<TrendingStylesPage> {
 
                     if (snapshot.hasError) {
                       return const Center(
-                        child: Text('Unable to load trending styles.'),
+                        child: Text('Unable to load outfits.'),
                       );
                     }
 
-                    final outfits = snapshot.data ?? [];
+                    final outfits = (snapshot.data ?? [])
+                        .where(
+                          (outfit) =>
+                      outfit.category.toLowerCase() ==
+                          widget.category.toLowerCase(),
+                    )
+                        .toList();
 
                     if (outfits.isEmpty) {
                       return const Center(
                         child: Text(
-                          'No trending styles available yet.',
-                          style: TextStyle(
-                            color: espresso,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          'No outfits found in this category.',
+                          style: TextStyle(color: espresso),
                         ),
                       );
                     }
 
                     return GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 25),
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 25),
                       itemCount: outfits.length,
                       gridDelegate:
                       const SliverGridDelegateWithFixedCrossAxisCount(
