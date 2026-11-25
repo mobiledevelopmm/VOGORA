@@ -1,4 +1,11 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:untitled/core/data/datasources/services/outfit_service.dart';
+import 'package:untitled/core/presentation/pages/auth/cubit/auth_cubit.dart';
+import 'package:untitled/core/presentation/pages/home/cubit/home_cubit.dart';
 import 'package:untitled/core/presentation/pages/home/home_page.dart';
 import 'package:untitled/core/presentation/pages/profile/profile_page.dart';
 import 'package:untitled/core/presentation/pages/saved_outfits/saved_outfits_page.dart';
@@ -21,7 +28,14 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     _pages = [
-      HomePage(onOpenProfile: _openProfile),
+      BlocProvider(
+        create: (context) => HomeCubit(
+          OutfitService(FirebaseFirestore.instance),
+        )..loadOutfits(
+          context.read<AuthCubit>().state.userGender ?? 'Female',
+        ),
+        child: HomePage(onOpenProfile: _openProfile),
+      ),
       const WardrobePage(),
       const SavedOutfitsPage(),
       const ProfilePage(),

@@ -1,11 +1,17 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:untitled/core/presentation/pages/home/subs/choose%20undertone/choose_undertone_page.dart';
-import 'package:untitled/core/presentation/pages/home/subs/styled_for_you/styled_for_you_page.dart';
-import 'package:untitled/core/presentation/pages/home/subs/trending_styles/trending_styles_page.dart';
 
+import '../../../data/models/outfit_item_model.dart';
+import '../../../data/services/style_profile_service.dart';
 import '../auth/cubit/auth_cubit.dart';
 import '../auth/widgets/fashion_background.dart';
+import '../choose undertone/choose_undertone_page.dart';
+import '../choose undertone/cubit/choose_undertone_cubit.dart';
+import '../styled_for_you/styled_for_you_page.dart';
+import '../trending_styles/trending_styles_page.dart';
+import 'cubit/home_cubit.dart';
+import 'cubit/home_state.dart';
 
 class HomePage extends StatelessWidget {
   final VoidCallback onOpenProfile;
@@ -49,7 +55,12 @@ class HomePage extends StatelessWidget {
   void _openUndertonePage(BuildContext context) {
     Navigator.of(context, rootNavigator: true).push(
       MaterialPageRoute(
-        builder: (_) => const ChooseUndertonePage(),
+        builder: (_) => BlocProvider(
+          create: (_) => ChooseUndertoneCubit(
+            StyleProfileService(),
+          ),
+          child: const ChooseUndertonePage(),
+        ),
       ),
     );
   }
@@ -170,7 +181,8 @@ class HomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 13),
                           ElevatedButton(
-                            onPressed: () => _openUndertonePage(context),
+                            onPressed: () =>
+                                _openUndertonePage(context),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: berry,
                               foregroundColor: Colors.white,
@@ -230,33 +242,15 @@ class HomePage extends StatelessWidget {
 
               SizedBox(
                 height: previewHeight,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _PreviewCard(
-                      title: 'Casual',
-                      subtitle: 'Effortless everyday looks',
-                      imageUrl:
-                      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=700',
-                      onTap: () => _openCollection(
-                        context,
-                        isTrending: false,
-                        category: 'Casual',
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    _PreviewCard(
-                      title: 'Korean',
-                      subtitle: 'Soft & modern fashion',
-                      imageUrl:
-                      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700',
-                      onTap: () => _openCollection(
-                        context,
-                        isTrending: false,
-                        category: 'Korean',
-                      ),
-                    ),
-                  ],
+                child: BlocBuilder<HomeCubit, HomeState>(
+                  builder: (context, state) {
+                    return _buildOutfitPreview(
+                      context,
+                      state: state,
+                      outfits: state.styledOutfits,
+                      isTrending: false,
+                    );
+                  },
                 ),
               ),
 
@@ -276,37 +270,121 @@ class HomePage extends StatelessWidget {
 
               SizedBox(
                 height: previewHeight,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _PreviewCard(
-                      title: 'Old Money',
-                      subtitle: 'Timeless luxury fashion',
-                      imageUrl:
-                      'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=700',
-                      onTap: () => _openCollection(
-                        context,
-                        isTrending: true,
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    _PreviewCard(
-                      title: 'Coquette',
-                      subtitle: 'Soft and romantic outfits',
-                      imageUrl:
-                      'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=700',
-                      onTap: () => _openCollection(
-                        context,
-                        isTrending: true,
-                      ),
-                    ),
-                  ],
+                child: BlocBuilder<HomeCubit, HomeState>(
+                  builder: (context, state) {
+                    return _buildOutfitPreview(
+                      context,
+                      state: state,
+                      outfits: state.trendingOutfits,
+                      isTrending: true,
+                    );
+                  },
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  // Outfit preview with loading, error and empty states
+  Widget _buildOutfitPreview(
+      BuildContext context, {
+        required HomeState state,
+        required List<OutfitItem> outfits,
+        required bool isTrending,
+      }) {
+    if (state.status == HomeStatus.initial ||
+        state.status == HomeStatus.loading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: coral,
+          strokeWidth: 3,
+        ),
+      );
+    }
+
+    if (state.status == HomeStatus.error) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.wifi_off_rounded,
+              color: berry,
+              size: 28,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              state.errorMessage ?? 'Unable to load outfits.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: espresso,
+                fontSize: 11,
+              ),
+            ),
+            const SizedBox(height: 5),
+            TextButton(
+              onPressed: () {
+                final gender =
+                    context.read<AuthCubit>().state.userGender ??
+                        'Female';
+
+                context.read<HomeCubit>().retry(gender);
+              },
+              child: const Text(
+                'Try Again',
+                style: TextStyle(
+                  color: coral,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (outfits.isEmpty) {
+      return Center(
+        child: Text(
+          'No outfits available yet.',
+          style: TextStyle(
+            color: espresso.withValues(alpha: 0.6),
+            fontSize: 12,
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: outfits.length,
+      itemBuilder: (context, index) {
+        final outfit = outfits[index];
+
+        return Padding(
+          padding: const EdgeInsets.only(right: 13),
+          child: _PreviewCard(
+            title: isTrending
+                ? outfit.title
+                : outfit.category.isNotEmpty
+                ? outfit.category
+                : outfit.title,
+            subtitle: outfit.description.isNotEmpty
+                ? outfit.description
+                : outfit.title,
+            imageUrl: outfit.imageURL,
+            onTap: () => _openCollection(
+              context,
+              isTrending: isTrending,
+              category: isTrending ? null : outfit.category,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -358,7 +436,10 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 4),
-              Icon(Icons.arrow_forward_ios_rounded, size: 12),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 12,
+              ),
             ],
           ),
         ),
