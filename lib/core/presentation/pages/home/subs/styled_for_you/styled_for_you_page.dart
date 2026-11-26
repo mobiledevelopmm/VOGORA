@@ -6,6 +6,7 @@ import '../../../../../data/models/outfit_item_model.dart';
 import '../../../auth/widgets/fashion_background.dart';
 import '../../widgets/outfit_detail_page.dart';
 import '../../widgets/outfit_grid_card.dart';
+
 class StyledForYouPage extends StatefulWidget {
   final String gender;
   final String? initialCategory;
@@ -31,8 +32,7 @@ class _StyledForYouPageState extends State<StyledForYouPage> {
     'Korean',
     'Streetwear',
     'Formal',
-    'Minimal',
-    'Vintage',
+    'Sporty'
   ];
 
   late String selectedCategory;
