@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 
-import '../../../auth/widgets/fashion_background.dart';
+import '../auth/widgets/fashion_background.dart';
 
 class BodyShapeResultPage extends StatelessWidget {
   final String bodyShape;
@@ -175,10 +174,7 @@ class BodyShapeResultPage extends StatelessWidget {
                   child: Text(
                     'We have estimated your body shape!',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: secondary,
-                      fontSize: 12,
-                    ),
+                    style: TextStyle(color: secondary, fontSize: 12),
                   ),
                 ),
 
@@ -219,11 +215,7 @@ class BodyShapeResultPage extends StatelessWidget {
                           color: Colors.white.withValues(alpha: 0.65),
                           shape: BoxShape.circle,
                         ),
-                        child: Icon(
-                          shapeIcon,
-                          color: berry,
-                          size: 48,
-                        ),
+                        child: Icon(shapeIcon, color: berry, size: 48),
                       ),
 
                       const SizedBox(height: 20),
@@ -273,9 +265,7 @@ class BodyShapeResultPage extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.85),
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: const Color(0xFFE9D9D6),
-                    ),
+                    border: Border.all(color: const Color(0xFFE9D9D6)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,17 +280,9 @@ class BodyShapeResultPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      _infoRow(
-                        Icons.person_outline_rounded,
-                        'Gender',
-                        gender,
-                      ),
+                      _infoRow(Icons.person_outline_rounded, 'Gender', gender),
                       const SizedBox(height: 12),
-                      _infoRow(
-                        Icons.palette_outlined,
-                        'Undertone',
-                        undertone,
-                      ),
+                      _infoRow(Icons.palette_outlined, 'Undertone', undertone),
                       const SizedBox(height: 12),
                       _infoRow(
                         Icons.accessibility_new_rounded,
@@ -327,16 +309,13 @@ class BodyShapeResultPage extends StatelessWidget {
 
                 const Text(
                   'Ideas to help you explore your personal style.',
-                  style: TextStyle(
-                    color: secondary,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: secondary, fontSize: 11),
                 ),
 
                 const SizedBox(height: 15),
 
                 ...stylingTips.map(
-                      (tip) => Container(
+                  (tip) => Container(
                     margin: const EdgeInsets.only(bottom: 11),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
@@ -375,9 +354,7 @@ class BodyShapeResultPage extends StatelessWidget {
                   height: 53,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).popUntil(
-                            (route) => route.isFirst,
-                      );
+                      Navigator.of(context).popUntil((route) => route.isFirst);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: berry,
@@ -403,10 +380,7 @@ class BodyShapeResultPage extends StatelessWidget {
                   child: Text(
                     'Your body shape is a styling guide, not a limitation.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: secondary,
-                      fontSize: 10,
-                    ),
+                    style: TextStyle(color: secondary, fontSize: 10),
                   ),
                 ),
               ],
@@ -417,26 +391,15 @@ class BodyShapeResultPage extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(
-      IconData icon,
-      String label,
-      String value,
-      ) {
+  Widget _infoRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(
-          icon,
-          color: berry,
-          size: 19,
-        ),
+        Icon(icon, color: berry, size: 19),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(
-              color: secondary,
-              fontSize: 12,
-            ),
+            style: const TextStyle(color: secondary, fontSize: 12),
           ),
         ),
         Text(

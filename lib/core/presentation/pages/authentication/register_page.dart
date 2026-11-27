@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:untitled/core/presentation/pages/auth/widgets/fashion_background.dart';
 
-import 'cubit/auth_cubit.dart';
-import 'cubit/auth_state.dart';
-import 'widgets/auth_text_field.dart';
-import 'widgets/auth_button.dart';
+import '../auth/cubit/auth_cubit.dart';
+import '../auth/cubit/auth_state.dart';
+import '../auth/widgets/auth_text_field.dart';
+import '../auth/widgets/auth_button.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

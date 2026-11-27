@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import 'cubit/auth_cubit.dart';
-import 'cubit/auth_state.dart';
-import 'widgets/fashion_background.dart';
+import '../auth/cubit/auth_cubit.dart';
+import '../auth/cubit/auth_state.dart';
+import '../auth/widgets/fashion_background.dart';
 
 class GenderSelectionPage extends StatefulWidget {
   const GenderSelectionPage({super.key});

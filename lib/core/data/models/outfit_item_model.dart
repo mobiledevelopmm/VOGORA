@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 
 class OutfitItem {
   final String id;
@@ -24,6 +25,9 @@ class OutfitItem {
       String id,
       Map<String, dynamic> data,
       ) {
+    debugPrint('DOCUMENT ID: $id');
+    debugPrint('IMAGE URL VALUE: ${data['imageURL']}');
+    debugPrint('IMAGE URL TYPE: ${data['imageURL'].runtimeType}');
     return OutfitItem(
       id: id,
       title: data['name']?.toString() ?? '',

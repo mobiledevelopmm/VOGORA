@@ -1,9 +1,9 @@
 
 import 'package:go_router/go_router.dart';
 import '../main_screen.dart';
-import '../pages/auth/gender_selection_page.dart';
-import '../pages/auth/login_page.dart';
-import '../pages/auth/register_page.dart';
+import '../pages/gender selection/gender_selection_page.dart';
+import '../pages/authentication/login_page.dart';
+import '../pages/authentication/register_page.dart';
 import '../pages/splash/splash_page.dart';
 
 class AppRouter {

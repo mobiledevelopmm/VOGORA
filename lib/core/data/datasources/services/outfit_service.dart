@@ -1,7 +1,5 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../../models/outfit_item_model.dart';
 
@@ -10,57 +8,52 @@ class OutfitService {
 
   OutfitService(this._firestore);
 
-  static const List<String> _categories = [
-    'casual',
-    'formal',
-    'korean',
-    'sporty',
-    'streetwear',
-  ];
-
   Stream<List<OutfitItem>> getOutfits({
     required String gender,
     required String type,
   }) {
-    final normalizedGender =
-    gender.trim().toLowerCase() == 'male' ? 'Male' : 'Female';
+    debugPrint('========== OUTFIT DEBUG ==========');
+    debugPrint('Requested gender: $gender');
+    debugPrint('Requested type: $type');
 
-    final streams = _categories.map((category) {
-      return _firestore
-          .collection('outfits')
-          .doc(category)
-          .collection(normalizedGender)
-          .snapshots();
-    }).toList();
+    return _firestore
+        .collection('casual_01')
+        .snapshots().map((snapshot) {
+      debugPrint('Total Firestore documents: ${snapshot.docs.length}');
 
-    return CombineLatestStream.list(streams).map((snapshots) {
-      final outfits = <OutfitItem>[];
+      final outfits = snapshot.docs.map((doc) {
+        final data = doc.data();
 
-      for (final snapshot in snapshots) {
-        for (final doc in snapshot.docs) {
-          final outfit = OutfitItem.fromFirestore(
-            doc.id,
-            doc.data(),
-          );
-          debugPrint(
-            'ID: ${outfit.id}, '
-                'Category: ${outfit.category}, '
-                'Type: ${outfit.type}, '
-                'Active: ${outfit.isActive}, '
-                'Image: ${outfit.imageURL.isNotEmpty}',
-          );
+        debugPrint('Document ID: ${doc.id}');
+        debugPrint('Data: $data');
 
-          if (outfit.isActive &&
-              outfit.type.trim().toLowerCase() ==
-                  type.trim().toLowerCase() &&
-              outfit.imageURL.isNotEmpty) {
-            outfits.add(outfit);
-          }
-        }
-      }
+        return OutfitItem.fromFirestore(doc.id, data);
+      }).toList();
 
-      debugPrint('Total outfits: ${outfits.length}');
-      return outfits;
+      final filtered = outfits.where((outfit) {
+        final matchesGender =
+            outfit.gender.trim().toLowerCase() ==
+                gender.trim().toLowerCase();
+
+        final matchesType =
+            outfit.type.trim().toLowerCase() ==
+                type.trim().toLowerCase();
+
+        final active = outfit.isActive;
+
+        debugPrint(
+          '${outfit.id}: gender=$matchesGender, '
+              'type=$matchesType, active=$active, '
+              'imageUrl=${outfit.imageURL}',
+        );
+
+        return matchesGender && matchesType && active;
+      }).toList();
+
+      debugPrint('Filtered outfits: ${filtered.length}');
+      debugPrint('==================================');
+
+      return filtered;
     });
   }
 }
