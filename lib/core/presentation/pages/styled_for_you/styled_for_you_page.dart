@@ -31,8 +31,7 @@ class _StyledForYouPageState extends State<StyledForYouPage> {
     'Korean',
     'Streetwear',
     'Formal',
-    'Minimal',
-    'Vintage',
+    'Sporty'
   ];
 
   late String selectedCategory;
